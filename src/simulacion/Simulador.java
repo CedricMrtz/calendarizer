@@ -14,7 +14,7 @@ public class Simulador {
   private final GestorColas gestor;
   private final int intervalAging;
 
-  private final List<String> gantt = new ArrayList<>();
+  private final GanttRenderer gantt = new GanttRenderer();
   private int cambiosContexto = 0;
   private int ticksCPUOcupada = 0;
   private int tiempoActual = 0;
@@ -65,7 +65,7 @@ public class Simulador {
       enEjecucion = gestor.getEnEjecucion();
       if (enEjecucion != null) {
         enEjecucion.setTiempoRestante(enEjecucion.getTiempoRestante() - 1);
-        gantt.add("P" + enEjecucion.getPid());
+        gantt.registrarTick("P" + enEjecucion.getPid());
         ticksCPUOcupada++;
 
         if (enEjecucion.getTiempoRestante() == 0) {
@@ -73,14 +73,14 @@ public class Simulador {
           cambiosContexto++;
         }
       } else {
-        gantt.add("--");
+        gantt.registrarTick("--");
       }
 
       gestor.actualizarEspera(intervalAging);
 
       tiempoActual++;
     }
-
+    gantt.imprimir();
     return construirResultado();
   }
 
@@ -90,6 +90,24 @@ public class Simulador {
     double promedioEspera = terminados.stream().mapToInt(PCB::getTiempoEspera).average().orElse(0);
     double promedioRetorno = terminados.stream().mapToInt(PCB::getTiempoRetorno).average().orElse(0);
     double usoCPU = tiempoActual > 0 ? (ticksCPUOcupada * 100.0 / tiempoActual) : 0;
+    System.out.println("\n--- TABLA DE PROCESOS ---");
+
+for (PCB p : terminados) {
+  System.out.println(
+    "P" + p.getPid() +
+    " | Llegada: " + p.getTiempoLlegada() +
+    " | Ráfaga: " + p.getTiempoRafaga() +
+    " | Inicio: " + p.getTiempoInicio() +
+    " | Fin: " + p.getTiempoFin() +
+    " | Espera: " + p.getTiempoEspera() +
+    " | Retorno: " + p.getTiempoRetorno()
+  );
+}
+
+System.out.println("\nPromedio espera: " + promedioEspera);
+System.out.println("Promedio retorno: " + promedioRetorno);
+System.out.println("Uso CPU: " + usoCPU + "%");
+System.out.println("Cambios de contexto: " + cambiosContexto);
 
     return new ResultadoSimulacion(
         calendarizador.getNombre(),
@@ -99,3 +117,4 @@ public class Simulador {
         cambiosContexto);
   }
 }
+
