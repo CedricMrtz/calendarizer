@@ -1,4 +1,4 @@
-pid,nombre,llegada,rafaga,prioridad,tiempoIO
+#pid,nombre,llegada,rafaga,prioridad,tiempoIO
 1,P1,0,15,1,0
 2,P2,1,2,1,0
 3,P3,2,1,1,0
