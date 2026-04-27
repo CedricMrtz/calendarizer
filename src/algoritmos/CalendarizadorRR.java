@@ -1,16 +1,21 @@
 package algoritmos;
+
 import modelo.PCB;
 import java.util.List;
 
-public class CalendarizadorRR extends CalendarizadorBase{
+public class CalendarizadorRR extends CalendarizadorBase {
 
     private int quantum;
     private int contador;
+    private PCB ultimoProceso;
 
-public CalendarizadorRR(int quantum) {
-    super("Round Robin", true);
-    this.quantum = quantum;
-}
+    public CalendarizadorRR(int quantum) {
+        super("Round Robin", true);
+        this.quantum = quantum;
+        this.contador = 0;
+        this.ultimoProceso = null;
+    }
+
     @Override
     public PCB seleccionarProceso(List<PCB> colaListos, int tiempoActual) {
         if (colaListos.isEmpty()) return null;
@@ -19,6 +24,13 @@ public CalendarizadorRR(int quantum) {
 
     @Override
     public boolean debeExpulsar(PCB actual, List<PCB> colaListos, int tiempoActual) {
+
+        // Si cambió el proceso, reinicia contador
+        if (ultimoProceso != actual) {
+            contador = 0;
+            ultimoProceso = actual;
+        }
+
         contador++;
 
         if (contador >= quantum) {
