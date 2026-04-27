@@ -31,57 +31,61 @@ public class Simulador {
       gestor.cargarProceso(p);
     }
   }
-
-  public ResultadoSimulacion ejecutar() {
-    System.out.println("Iniciando simulación: " + calendarizador.getNombre() + " \n");
-
-    while (gestor.hayProcesosActivos()) {
-      gestor.admitirProcesos(tiempoActual);
-
-      gestor.actualizarBloqueados();
-
-      gestor.admitirProcesos(tiempoActual);
-
-      PCB enEjecucion = gestor.getEnEjecucion();
-
-      if (enEjecucion != null && calendarizador.esApropiativo()) {
-        if (calendarizador.debeExpulsar(enEjecucion, gestor.getColaListos(), tiempoActual)) {
-          gestor.expulsarAListos();
-          cambiosContexto++;
-          enEjecucion = null;
+  
+    public ResultadoSimulacion ejecutar() {
+        System.out.println("Iniciando simulación: " + calendarizador.getNombre() + " \n");
+        while (gestor.hayProcesosActivos()) {
+            admitirYDesbloquear();
+            evaluarExpulsion();
+            asignarCPUSiLibre();
+            ejecutarTick();
+            gestor.actualizarEspera(intervalAging);
+            tiempoActual++;
         }
-      }
-
-      if (gestor.getEnEjecucion() == null && !gestor.getColaListos().isEmpty()) {
-        PCB siguiente = calendarizador.seleccionarProceso(gestor.getColaListos(), tiempoActual);
-        if (siguiente != null) {
-          gestor.asignarCPU(siguiente, tiempoActual);
-          cambiosContexto++;
-        }
-      }
-
-      enEjecucion = gestor.getEnEjecucion();
-      if (enEjecucion != null) {
-        enEjecucion.setTiempoRestante(enEjecucion.getTiempoRestante() - 1);
-        gantt.registrarTick("P" + enEjecucion.getPid());
-        ticksCPUOcupada++;
-
-        if (enEjecucion.getTiempoRestante() == 0) {
-          gestor.terminarProceso(tiempoActual + 1);
-          cambiosContexto++;
-        }
-      } else {
-        gantt.registrarTick("--");
-      }
-
-      gestor.actualizarEspera(intervalAging);
-
-      tiempoActual++;
+        gantt.imprimir();
+        return construirResultado();
     }
-    gantt.imprimir();
-    return construirResultado();
-  }
 
+    private void admitirYDesbloquear() {
+        gestor.admitirProcesos(tiempoActual);
+        gestor.actualizarBloqueados();
+        gestor.admitirProcesos(tiempoActual);
+    }
+
+    private void evaluarExpulsion() {
+        PCB enEjecucion = gestor.getEnEjecucion();
+        if (enEjecucion != null && calendarizador.esApropiativo()) {
+            if (calendarizador.debeExpulsar(enEjecucion, gestor.getColaListos(), tiempoActual)) {
+                gestor.expulsarAListos();
+                cambiosContexto++;
+            }
+        }
+    }
+
+    private void asignarCPUSiLibre() {
+        if (gestor.getEnEjecucion() == null && !gestor.getColaListos().isEmpty()) {
+            PCB siguiente = calendarizador.seleccionarProceso(gestor.getColaListos(), tiempoActual);
+            if (siguiente != null) {
+                gestor.asignarCPU(siguiente, tiempoActual);
+                cambiosContexto++;
+            }
+        }
+    }
+
+    private void ejecutarTick() {
+        PCB enEjecucion = gestor.getEnEjecucion();
+        if (enEjecucion != null) {
+            enEjecucion.setTiempoRestante(enEjecucion.getTiempoRestante() - 1);
+            gantt.registrarTick("P" + enEjecucion.getPid());
+            ticksCPUOcupada++;
+            if (enEjecucion.getTiempoRestante() == 0) {
+                gestor.terminarProceso(tiempoActual + 1);
+                cambiosContexto++;
+            }
+        } else {
+            gantt.registrarTick("--");
+        }
+    }
   private ResultadoSimulacion construirResultado() {
     List<PCB> terminados = gestor.getColaTerminados();
 
