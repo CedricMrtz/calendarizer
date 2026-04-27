@@ -1,14 +1,13 @@
 import algoritmos.Calendarizador;
 import algoritmos.CalendarizadorFCFS;
-import modelo.Estado;
-import modelo.PCB;
-import modelo.ResultadoSimulacion;
-import simulacion.Simulador;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-//
+import modelo.Estado;
+import modelo.PCB;
+import modelo.ResultadoSimulacion;
+import simulacion.Simulador;
 
 public class Main {
   public static void main(String[] args) throws Exception {

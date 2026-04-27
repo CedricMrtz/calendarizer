@@ -1,11 +1,11 @@
 package algoritmos;
 
-import modelo.PCB;
 import java.util.List;
+import modelo.PCB;
 
 public class CalendarizadorRR extends CalendarizadorBase {
 
-    private int quantum;
+    private final int quantum;
     private int contador;
     private PCB ultimoProceso;
 

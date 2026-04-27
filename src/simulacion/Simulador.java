@@ -1,12 +1,10 @@
 package simulacion;
 
 import algoritmos.Calendarizador;
-import modelo.Estado;
-import modelo.PCB;
-import modelo.ResultadoSimulacion;
-
 import java.util.ArrayList;
 import java.util.List;
+import modelo.PCB;
+import modelo.ResultadoSimulacion;
 
 public class Simulador {
 

@@ -1,16 +1,15 @@
 package simulacion;
 
+import java.util.*;
 import modelo.Estado;
 import modelo.PCB;
 
-import java.util.*;
-
 public class GestorColas {
-  private Queue<PCB> colaNuevos;
-  private List<PCB> colaListos;
+  private final Queue<PCB> colaNuevos;
+  private final List<PCB> colaListos;
   private PCB enEjecucion;
-  private List<PCB> colaBloqueados;
-  private List<PCB> colaTerminados;
+  private final List<PCB> colaBloqueados;
+  private final List<PCB> colaTerminados;
   private final Map<Integer, Integer> tiempoIORestante;
 
   public GestorColas() {

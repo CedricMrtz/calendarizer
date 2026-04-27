@@ -1,9 +1,9 @@
     package algoritmos;
-    import modelo.PCB;
     import java.util.*;
+    import modelo.PCB;
 
 public class CalendarizadorPrioridades extends CalendarizadorBase{
-        private int agingIntervalo;
+        private final int agingIntervalo;
 
         public CalendarizadorPrioridades(int agingIntervalo) {
             super("Prioridades con Aging", true);
