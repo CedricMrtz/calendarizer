@@ -8,11 +8,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+//
 
 public class Main {
   public static void main(String[] args) throws Exception {
     String ruta = "./casos_de_prueba/caso1_fcfs_convoy.txt";
     Calendarizador algoritmo = new CalendarizadorFCFS();
+    //Calendarizador algoritmo = new CalendarizadorRR(2); // Quantum de 2
 
     List<PCB> procesos = new ArrayList<>();
     BufferedReader br = new BufferedReader(new FileReader(ruta));
