@@ -101,11 +101,11 @@ for (PCB p : terminados) {
     " | Retorno: " + p.getTiempoRetorno()
   );
 }
-
-System.out.println("\nPromedio espera: " + promedioEspera);
-System.out.println("Promedio retorno: " + promedioRetorno);
-System.out.println("Uso CPU: " + usoCPU + "%");
-System.out.println("Cambios de contexto: " + cambiosContexto);
+//
+// System.out.println("\nPromedio espera: " + promedioEspera);
+// System.out.println("Promedio retorno: " + promedioRetorno);
+// System.out.println("Uso CPU: " + usoCPU + "%");
+// System.out.println("Cambios de contexto: " + cambiosContexto);
 
     return new ResultadoSimulacion(
         calendarizador.getNombre(),

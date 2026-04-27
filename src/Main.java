@@ -11,7 +11,7 @@ import simulacion.Simulador;
 
 public class Main {
   public static void main(String[] args) throws Exception {
-    String ruta = "./casos_de_prueba/caso1_fcfs_convoy.txt";
+    String ruta = "../casos_de_prueba/caso1_fcfs_convoy.txt";
     Calendarizador algoritmo = new CalendarizadorFCFS();
     //Calendarizador algoritmo = new CalendarizadorRR(2); // Quantum de 2
 
