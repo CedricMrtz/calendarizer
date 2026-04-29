@@ -10,7 +10,6 @@ public class Simulador {
 
   private final Calendarizador calendarizador;
   private final GestorColas gestor;
-  private final int intervalAging;
 
   private final GanttRenderer gantt = new GanttRenderer();
   private int cambiosContexto = 0;
@@ -18,10 +17,9 @@ public class Simulador {
   private int tiempoActual = 0;
   private PCB ultimoEjecutado = null;
 
-  public Simulador(Calendarizador calendarizador, List<PCB> procesos, int intervalAging) {
+  public Simulador(Calendarizador calendarizador, List<PCB> procesos) {
     this.calendarizador = calendarizador;
     this.gestor = new GestorColas();
-    this.intervalAging = intervalAging;
 
     List<Integer> pids = new ArrayList<>();
     for (PCB p : procesos) {
@@ -40,7 +38,7 @@ public class Simulador {
       evaluarExpulsion();
       asignarCPUSiLibre();
       ejecutarTick();
-      gestor.actualizarEspera(intervalAging);
+      gestor.actualizarEspera();
       tiempoActual++;
     }
     gantt.imprimir();

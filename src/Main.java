@@ -25,24 +25,33 @@ public class Main {
         new CalendarizadorFCFS(),
         new CalendarizadorSJF(),
         new CalendarizadorRR(2), // Quantum de 2
-        new CalendarizadorPrioridades(2),
+        new CalendarizadorRR(10), // Quantum de 10
+        new CalendarizadorPrioridades(5), // Aging de 5
         new CalendarizadorSRTF());
 
-    simular(ruta1, algoritmos.get(0), 0); // FCFS
+    // Caso 1
+    simular(ruta1, algoritmos.get(0));
     System.out.println();
-    simular(ruta2, algoritmos.get(1), 0); // SJF
+    // Caso 2
+    simular(ruta2, algoritmos.get(1));
     System.out.println();
-    simular(ruta3, algoritmos.get(2), 0); // RR
+    // Caso 3.1
+    simular(ruta3, algoritmos.get(2));
     System.out.println();
-    simular(ruta4, algoritmos.get(3), 0); // Prioridades
+    // Caso 3.2
+    simular(ruta3, algoritmos.get(3));
     System.out.println();
-    // simular(ruta5, algoritmos.get(4), 0); // SRT
+    // Caso 4
+    simular(ruta4, algoritmos.get(4));
+    System.out.println();
+    // Casp 5
+    // simular(ruta5, algoritmos.get(5));
   }
 
-  private static ResultadoSimulacion simular(String ruta, Calendarizador algoritmo, int intervalAging)
+  private static ResultadoSimulacion simular(String ruta, Calendarizador algoritmo)
       throws Exception {
     List<PCB> procesos = cargarProcesos(ruta);
-    Simulador simulador = new Simulador(algoritmo, procesos, intervalAging);
+    Simulador simulador = new Simulador(algoritmo, procesos);
 
     ResultadoSimulacion resultado = simulador.ejecutar();
     resultado.imprimir();

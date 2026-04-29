@@ -105,12 +105,10 @@ public class GestorColas {
     }
   }
 
-  public void actualizarEspera(int intervalAging) {
+  public void actualizarEspera() {
     for (PCB proceso : colaListos) {
       proceso.incrementarTiempoEspera();
-      if (intervalAging > 0 && proceso.getTiempoEspera() % intervalAging == 0) {
-        proceso.incrementarContadorAging();
-      }
+      proceso.incrementarContadorAging();
     }
   }
 
