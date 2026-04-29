@@ -1,5 +1,7 @@
 import algoritmos.Calendarizador;
 import algoritmos.CalendarizadorFCFS;
+import algoritmos.CalendarizadorPrioridades;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -12,7 +14,9 @@ import simulacion.Simulador;
 public class Main {
   public static void main(String[] args) throws Exception {
     String ruta = "../casos_de_prueba/caso1_fcfs_convoy.txt";
-    Calendarizador algoritmo = new CalendarizadorFCFS();
+    int intervalAging = 2;
+    Calendarizador algoritmo = new CalendarizadorPrioridades(intervalAging);
+
     //Calendarizador algoritmo = new CalendarizadorRR(2); // Quantum de 2
 
     List<PCB> procesos = new ArrayList<>();
@@ -31,7 +35,7 @@ public class Main {
     }
     br.close();
 
-    Simulador simulador = new Simulador(algoritmo, procesos, 0);
+    Simulador simulador = new Simulador(algoritmo, procesos, intervalAging);
     ResultadoSimulacion resultado = simulador.ejecutar();
     resultado.imprimir();
   }
