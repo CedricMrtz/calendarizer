@@ -38,20 +38,46 @@ classDiagram
             -int tiempoInicio
             -int tiempoFin
             -int contadorAging
-            -Map contextoCPU
-            +transicionarEstado(Estado e) void
+            -Map~String, Object~ contextoCPU
+            +PCB(int pid, String nombre, Estado estado, int prioridad, int tiempoLlegada, int tiempoRafaga)
+            +transicionarEstado(Estado nuevo) void
             +getPrioridadEfectiva() int
             +compareTo(PCB o) int
             +toString() String
+            +getPid() int
+            +getNombre() String
+            +getEstado() Estado
+            +getPrioridad() int
+            +getTiempoLlegada() int
+            +getTiempoRafaga() int
+            +getTiempoRestante() int
+            +getTiempoEspera() int
+            +getTiempoRetorno() int
+            +getTiempoInicio() int
+            +getTiempoFin() int
+            +getContadorAging() int
+            +getContextoCPU() Map~String, Object~
+            +setTiempoRestante(int v) void
+            +incrementarTiempoEspera() void
+            +setTiempoRetorno(int v) void
+            +setTiempoInicio(int v) void
+            +setTiempoFin(int v) void
+            +incrementarContadorAging() void
         }
 
         class ResultadoSimulacion {
+            -String nombreAlgoritmo
             -double esperaPromedio
             -double retornoPromedio
             -double usoCPU
             -int cambiosContexto
-            +getCambiosContexto() int
+            +ResultadoSimulacion(String nombreAlgoritmo, double esperaPromedio, double retornoPromedio, double usoCPU, int cambiosContexto)
             +imprimir() void
+            +getNombreAlgoritmo() String
+            +getCambiosContexto() int
+            +getEsperaPromedio() double
+            +getRetornoPromedio() double
+            +getUsoCPU() double
         }
     }
 
@@ -68,80 +94,97 @@ classDiagram
             <<abstract>>
             -String nombre
             -boolean apropiativo
+            +CalendarizadorBase(String nombre, boolean apropiativo)
             +getNombre() String
-            +esApropiartivo() boolean
-            +debeExpulsar() boolean
+            +esApropiativo() boolean
+            +debeExpulsar(PCB enEjecucion, List~PCB~ colaListos, int tiempoActual) boolean
         }
 
         class CalendarizadorFCFS {
             +seleccionarProceso(List~PCB~ lista, int t) PCB
-            +esApropiativo() boolean
-            +debeExpulsar(PCB p, List~PCB~ lista, int t) boolean
         }
 
         class CalendarizadorSJF {
             +seleccionarProceso(List~PCB~ lista, int t) PCB
-            +esApropiativo() boolean
-            +debeExpulsar(PCB p, List~PCB~ lista, int t) boolean
         }
 
         class CalendarizadorSRTF {
             +seleccionarProceso(List~PCB~ lista, int t) PCB
-            +esApropiativo() boolean
-            +debeExpulsar(PCB p, List~PCB~ lista, int t) boolean
+            +debeExpulsar(PCB enEjecucion, List~PCB~ colaListos, int tiempoActual) boolean
         }
 
         class CalendarizadorRR {
             -int quantum
+            -int contador
+            -PCB ultimoProceso
             +CalendarizadorRR(int quantum)
             +seleccionarProceso(List~PCB~ lista, int t) PCB
-            +esApropiativo() boolean
-            +debeExpulsar(PCB p, List~PCB~ lista, int t) boolean
+            +debeExpulsar(PCB actual, List~PCB~ colaListos, int tiempoActual) boolean
         }
 
         class CalendarizadorPrioridades {
-            -int intervaloN
-            +CalendarizadorPrioridades(int intervaloN)
+            -int agingIntervalo
+            +CalendarizadorPrioridades(int agingIntervalo)
             +seleccionarProceso(List~PCB~ lista, int t) PCB
-            +esApropiativo() boolean
-            +debeExpulsar(PCB p, List~PCB~ lista, int t) boolean
+            -prioridadEfectiva(PCB p) int
+            +debeExpulsar(PCB actual, List~PCB~ colaListos, int tiempoActual) boolean
         }
     }
 
     namespace simulacion {
         class Simulador {
-            -Calendarizador algoritmo
-            -GestorColas gestorColas
+            -Calendarizador calendarizador
+            -GestorColas gestor
             -GanttRenderer gantt
+            -int cambiosContexto
+            -int ticksCPUOcupada
             -int tiempoActual
-            -PCB procesoEnCPU
-            +Simulador(Calendarizador alg, List~PCB~ procesos)
-            +iniciar() void
-            +ejecutarTick() void
-            +getResultado() ResultadoSimulacion
+            -PCB ultimoEjecutado
+            +Simulador(Calendarizador calendarizador, List~PCB~ procesos)
+            +ejecutar() ResultadoSimulacion
+            -admitirYDesbloquear() void
+            -evaluarExpulsion() void
+            -asignarCPUSiLibre() void
+            -ejecutarTick() void
+            -construirResultado() ResultadoSimulacion
         }
 
         class GestorColas {
             -Queue~PCB~ colaNuevos
             -List~PCB~ colaListos
+            -PCB enEjecucion
             -List~PCB~ colaBloqueados
-            -List~PCB~ terminados
-            +admitirProcesos(int t) void
-            +desbloquear(int t) void
+            -List~PCB~ colaTerminados
+            -Map~Integer, Integer~ tiempoIORestante
+            +GestorColas()
+            +cargarProceso(PCB proceso) void
+            +admitirProcesos(int tiempoActual) void
+            +asignarCPU(PCB proceso, int tiempoActual) void
+            +expulsarAListos() void
+            +terminarProceso(int tiempoActual) void
+            +liberarCPU() void
+            +bloquearProceso(int tiempoIO) void
+            +actualizarBloqueados() void
+            +actualizarEspera() void
+            +hayProcesosActivos() boolean
+            +getColaNuevos() Queue~PCB~
             +getColaListos() List~PCB~
-            +imprimirEstado() void
+            +getEnEjecucion() PCB
+            +getColaBloqueados() List~PCB~
+            +getColaTerminados() List~PCB~
         }
 
         class GanttRenderer {
-            -List registros
-            -int maxTick
-            +registrar(PCB p, int t) void
-            +renderizar() void
+            -List~String~ timeline
+            +registrarTick(String nombreProceso) void
+            +imprimir() void
         }
 
     }
     class Main {
         +main(String[] args) void
+        -simular(String ruta, Calendarizador algoritmo) ResultadoSimulacion
+        -cargarProcesos(String ruta) List~PCB~
     }
 
     %% Relaciones modelo
