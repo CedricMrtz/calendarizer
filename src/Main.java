@@ -1,5 +1,8 @@
 import algoritmos.Calendarizador;
 import algoritmos.CalendarizadorFCFS;
+import algoritmos.CalendarizadorPrioridades;
+import algoritmos.CalendarizadorRR;
+import algoritmos.CalendarizadorSJF;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -14,10 +17,10 @@ public class Main {
     String ruta = "./casos_de_prueba/caso1_fcfs_convoy.txt";
 
     List<Calendarizador> algoritmos = List.of(
-      new CalendarizadorFCFS()
-      // new CalendarizadorSJF(),
-      // new CalendarizadorRR(2), // Quantum de 2
-      // new CalendarizadorPrioridades()
+      new CalendarizadorFCFS(),
+      new CalendarizadorSJF(),
+      new CalendarizadorRR(2), // Quantum de 2
+      new CalendarizadorPrioridades(2)
     );
 
     for (Calendarizador alg : algoritmos) {
