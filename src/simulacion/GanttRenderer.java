@@ -3,7 +3,7 @@ import java.util.*;
 
 public class GanttRenderer {
 
-    private List<String> timeline = new ArrayList<>();
+    private final List<String> timeline = new ArrayList<>();
 
     public void registrarTick(String nombreProceso) {
         if (nombreProceso == null) {
