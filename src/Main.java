@@ -3,6 +3,7 @@ import algoritmos.CalendarizadorFCFS;
 import algoritmos.CalendarizadorPrioridades;
 import algoritmos.CalendarizadorRR;
 import algoritmos.CalendarizadorSJF;
+import algoritmos.CalendarizadorSRTF;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -14,23 +15,33 @@ import simulacion.Simulador;
 
 public class Main {
   public static void main(String[] args) throws Exception {
-    String ruta = "./casos_de_prueba/caso1_fcfs_convoy.txt";
+    String ruta1 = "./casos_de_prueba/caso1_fcfs_convoy.txt";
+    String ruta2 = "./casos_de_prueba/caso2_sjf_inanicion.txt";
+    String ruta3 = ruta1;
+    String ruta4 = "./casos_de_prueba/caso4_prioridades.txt";
+    String ruta5 = "./casos_de_prueba/caso5_libre.txt";
 
     List<Calendarizador> algoritmos = List.of(
-      new CalendarizadorFCFS(),
-      new CalendarizadorSJF(),
-      new CalendarizadorRR(2), // Quantum de 2
-      new CalendarizadorPrioridades(2)
-    );
+        new CalendarizadorFCFS(),
+        new CalendarizadorSJF(),
+        new CalendarizadorRR(2), // Quantum de 2
+        new CalendarizadorPrioridades(2),
+        new CalendarizadorSRTF());
 
-    for (Calendarizador alg : algoritmos) {
-      simular(ruta, alg, 0);
-      System.out.println();
-    }
+    simular(ruta1, algoritmos.get(0), 0); // FCFS
+    System.out.println();
+    simular(ruta2, algoritmos.get(1), 0); // SJF
+    System.out.println();
+    simular(ruta3, algoritmos.get(2), 0); // RR
+    System.out.println();
+    simular(ruta4, algoritmos.get(3), 0); // Prioridades
+    System.out.println();
+    // simular(ruta5, algoritmos.get(4), 0); // SRT
   }
 
-  private static ResultadoSimulacion simular(String ruta, Calendarizador algoritmo, int intervalAging) throws Exception {
-    List<PCB> procesos = cargarProcesos(ruta); 
+  private static ResultadoSimulacion simular(String ruta, Calendarizador algoritmo, int intervalAging)
+      throws Exception {
+    List<PCB> procesos = cargarProcesos(ruta);
     Simulador simulador = new Simulador(algoritmo, procesos, intervalAging);
 
     ResultadoSimulacion resultado = simulador.ejecutar();
@@ -38,12 +49,13 @@ public class Main {
 
     return resultado;
   }
+
   private static List<PCB> cargarProcesos(String ruta) throws Exception {
     List<PCB> procesos = new ArrayList<>();
     try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
       String linea;
       while ((linea = br.readLine()) != null) {
-        if (linea.isBlank() || linea.startsWith("#")) 
+        if (linea.isBlank() || linea.startsWith("#"))
           continue;
 
         String[] p = linea.split(",");
