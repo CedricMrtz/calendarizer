@@ -45,7 +45,7 @@ public class Main {
     simular(ruta4, algoritmos.get(4));
     System.out.println();
     // Casp 5
-    // simular(ruta5, algoritmos.get(5));
+    simular(ruta5, algoritmos.get(5));
   }
 
   private static ResultadoSimulacion simular(String ruta, Calendarizador algoritmo)
