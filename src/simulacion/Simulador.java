@@ -16,6 +16,7 @@ public class Simulador {
   private int cambiosContexto = 0;
   private int ticksCPUOcupada = 0;
   private int tiempoActual = 0;
+  private PCB ultimoEjecutado = null;
 
   public Simulador(Calendarizador calendarizador, List<PCB> procesos, int intervalAging) {
     this.calendarizador = calendarizador;
@@ -31,61 +32,64 @@ public class Simulador {
       gestor.cargarProceso(p);
     }
   }
-  
-    public ResultadoSimulacion ejecutar() {
-        System.out.println("Iniciando simulación: " + calendarizador.getNombre() + " \n");
-        while (gestor.hayProcesosActivos()) {
-            admitirYDesbloquear();
-            evaluarExpulsion();
-            asignarCPUSiLibre();
-            ejecutarTick();
-            gestor.actualizarEspera(intervalAging);
-            tiempoActual++;
-        }
-        gantt.imprimir();
-        return construirResultado();
-    }
 
-    private void admitirYDesbloquear() {
-        gestor.admitirProcesos(tiempoActual);
-        gestor.actualizarBloqueados();
-        gestor.admitirProcesos(tiempoActual);
+  public ResultadoSimulacion ejecutar() {
+    System.out.println("Iniciando simulación: " + calendarizador.getNombre() + " \n");
+    while (gestor.hayProcesosActivos()) {
+      admitirYDesbloquear();
+      evaluarExpulsion();
+      asignarCPUSiLibre();
+      ejecutarTick();
+      gestor.actualizarEspera(intervalAging);
+      tiempoActual++;
     }
+    gantt.imprimir();
+    return construirResultado();
+  }
 
-    private void evaluarExpulsion() {
-        PCB enEjecucion = gestor.getEnEjecucion();
-        if (enEjecucion != null && calendarizador.esApropiativo()) {
-            if (calendarizador.debeExpulsar(enEjecucion, gestor.getColaListos(), tiempoActual)) {
-                gestor.expulsarAListos();
-                cambiosContexto++;
-            }
-        }
-    }
+  private void admitirYDesbloquear() {
+    gestor.admitirProcesos(tiempoActual);
+    gestor.actualizarBloqueados();
+    gestor.admitirProcesos(tiempoActual);
+  }
 
-    private void asignarCPUSiLibre() {
-        if (gestor.getEnEjecucion() == null && !gestor.getColaListos().isEmpty()) {
-            PCB siguiente = calendarizador.seleccionarProceso(gestor.getColaListos(), tiempoActual);
-            if (siguiente != null) {
-                gestor.asignarCPU(siguiente, tiempoActual);
-                cambiosContexto++;
-            }
-        }
+  private void evaluarExpulsion() {
+    PCB enEjecucion = gestor.getEnEjecucion();
+    if (enEjecucion != null && calendarizador.esApropiativo()) {
+      if (calendarizador.debeExpulsar(enEjecucion, gestor.getColaListos(), tiempoActual)) {
+        gestor.expulsarAListos();
+        cambiosContexto++;
+      }
     }
+  }
 
-    private void ejecutarTick() {
-        PCB enEjecucion = gestor.getEnEjecucion();
-        if (enEjecucion != null) {
-            enEjecucion.setTiempoRestante(enEjecucion.getTiempoRestante() - 1);
-            gantt.registrarTick("P" + enEjecucion.getPid());
-            ticksCPUOcupada++;
-            if (enEjecucion.getTiempoRestante() == 0) {
-                gestor.terminarProceso(tiempoActual + 1);
-                cambiosContexto++;
-            }
-        } else {
-            gantt.registrarTick("--");
+  private void asignarCPUSiLibre() {
+    if (gestor.getEnEjecucion() == null && !gestor.getColaListos().isEmpty()) {
+      PCB siguiente = calendarizador.seleccionarProceso(gestor.getColaListos(), tiempoActual);
+      if (siguiente != null) {
+        gestor.asignarCPU(siguiente, tiempoActual);
+        if (ultimoEjecutado != null) {
+          cambiosContexto++;
         }
+        ultimoEjecutado = siguiente;
+      }
     }
+  }
+
+  private void ejecutarTick() {
+    PCB enEjecucion = gestor.getEnEjecucion();
+    if (enEjecucion != null) {
+      enEjecucion.setTiempoRestante(enEjecucion.getTiempoRestante() - 1);
+      gantt.registrarTick("P" + enEjecucion.getPid());
+      ticksCPUOcupada++;
+      if (enEjecucion.getTiempoRestante() == 0) {
+        gestor.terminarProceso(tiempoActual + 1);
+      }
+    } else {
+      gantt.registrarTick("--");
+    }
+  }
+
   private ResultadoSimulacion construirResultado() {
     List<PCB> terminados = gestor.getColaTerminados();
 
@@ -94,22 +98,16 @@ public class Simulador {
     double usoCPU = tiempoActual > 0 ? (ticksCPUOcupada * 100.0 / tiempoActual) : 0;
     System.out.println("\n--- TABLA DE PROCESOS ---");
 
-for (PCB p : terminados) {
-  System.out.println(
-    "P" + p.getPid() +
-    " | Llegada: " + p.getTiempoLlegada() +
-    " | Ráfaga: " + p.getTiempoRafaga() +
-    " | Inicio: " + p.getTiempoInicio() +
-    " | Fin: " + p.getTiempoFin() +
-    " | Espera: " + p.getTiempoEspera() +
-    " | Retorno: " + p.getTiempoRetorno()
-  );
-}
-//
-// System.out.println("\nPromedio espera: " + promedioEspera);
-// System.out.println("Promedio retorno: " + promedioRetorno);
-// System.out.println("Uso CPU: " + usoCPU + "%");
-// System.out.println("Cambios de contexto: " + cambiosContexto);
+    for (PCB p : terminados) {
+      System.out.println(
+          "P" + p.getPid() +
+              " | Llegada: " + p.getTiempoLlegada() +
+              " | Ráfaga: " + p.getTiempoRafaga() +
+              " | Inicio: " + p.getTiempoInicio() +
+              " | Fin: " + p.getTiempoFin() +
+              " | Espera: " + p.getTiempoEspera() +
+              " | Retorno: " + p.getTiempoRetorno());
+    }
 
     return new ResultadoSimulacion(
         calendarizador.getNombre(),
@@ -119,4 +117,3 @@ for (PCB p : terminados) {
         cambiosContexto);
   }
 }
-
