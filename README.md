@@ -6,8 +6,16 @@ This project implements a process scheduling simulator in Java as part of an Ope
 The goal is to model how an operating system manages processes using different CPU scheduling algorithms. The simulator will represent processes using a Process Control Block (PCB), handle process queues, and evaluate performance metrics.
 
 ## Tech Stack
-- Java 11+ (recommended Java 17)
+- Java 14+ (recommended Java 17)
 - Standard Java libraries only
+
+## Compile and Run
+From the project root:
+
+```bash
+javac -d bin -sourcepath src src/Main.java
+java -cp bin Main
+```
 
 ## UML Diagram
 
